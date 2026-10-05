@@ -23,7 +23,7 @@ const requestHeaders = () => ({ Authorization: `Bearer ${props.accessToken}` })
 const loadWarehouses = async () => {
   errorMessage.value = ''
   try {
-    const response = await fetch('http://127.0.0.1:8000/warehouse-capacity', { headers: requestHeaders() })
+    const response = await fetch('http://127.0.0.1:8001/warehouse-capacity', { headers: requestHeaders() })
     const result = await response.json().catch(() => null)
     if (!response.ok) throw new Error(result?.detail || 'Kunde inte hämta lagerkapaciteten.')
     warehouses.value = result
@@ -46,7 +46,7 @@ const saveCapacity = async (warehouse: WarehouseCapacity) => {
   savingWarehouseId.value = warehouse.id
   errorMessage.value = ''
   try {
-    const response = await fetch(`http://127.0.0.1:8000/warehouse-capacity/${warehouse.id}`, {
+    const response = await fetch(`http://127.0.0.1:8001/warehouse-capacity/${warehouse.id}`, {
       method: 'PATCH',
       headers: { ...requestHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ capacity_m2: capacity }),

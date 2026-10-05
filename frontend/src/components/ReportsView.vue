@@ -25,7 +25,7 @@ const loadGeneratedReports = async () => {
   reportsLoading.value = true
   reportsError.value = ''
   try {
-    const response = await fetch('http://127.0.0.1:8000/reports', {
+    const response = await fetch('http://127.0.0.1:8001/reports', {
       headers: { Authorization: `Bearer ${props.accessToken}` },
     })
     const result = await response.json().catch(() => null)

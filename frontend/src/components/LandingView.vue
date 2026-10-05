@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
 import QRCode from 'qrcode'
 const emit = defineEmits<{ login: [account?: { name: string; email: string; role: string; access_token: string }] }>()
@@ -26,7 +26,7 @@ const apiErrorMessage = (result: unknown, fallback: string) => {
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)
 const submitLogin = async () => {
   try {
-    const response = await fetch('http://localhost:8000/login', {
+    const response = await fetch('http://localhost:8001/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -52,7 +52,7 @@ const submitLogin = async () => {
     emit('login', account)
   } catch (error) {
     loginError.value = error instanceof TypeError
-      ? 'Kan inte nå backend. Kontrollera att Uvicorn körs på port 8000.'
+      ? 'Kan inte nå backend. Kontrollera att Uvicorn körs på port 8001.'
       : error instanceof Error
         ? error.message
         : 'Inloggningen misslyckades.'
@@ -105,7 +105,7 @@ const setupTwoFactor = async () => {
   twoFactorSetup.value = null
   twoFactorQrCode.value = ''
   try {
-    const response = await fetch('http://localhost:8000/account-applications/two-factor/setup', {
+    const response = await fetch('http://localhost:8001/account-applications/two-factor/setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: normalizedSignupEmail.value }),
@@ -134,7 +134,7 @@ const submitSignup = async () => {
   signupError.value = ''
   if (!canRegister.value) return
   try {
-    const response = await fetch('http://localhost:8000/account-applications', {
+    const response = await fetch('http://localhost:8001/account-applications', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -159,7 +159,7 @@ const submitSignup = async () => {
 <template>
   <div class="landing-page">
     <header class="landing-nav">
-      <div class="landing-brand"><span aria-hidden="true">▦</span><b>Smart Lagring</b></div>
+      <div class="landing-brand"><span aria-hidden="true"><svg class="warehouse-logo" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6v10H3z" /><path d="M6 11h12v9H6zM9 14v6m6-6v6M6 14h12" /></svg></span><b>Smart Lagring</b></div>
       <nav aria-label="Huvudmeny">
         <a href="#home">Hem</a><a href="#landing-features">Materiel</a><a href="#landing-features">Platser</a><a href="#landing-features">Rapporter</a>
       </nav>
@@ -172,7 +172,7 @@ const submitSignup = async () => {
           <path class="landing-icon-small" d="M22 27h7v-5h-7zM23 24h5" />
         </svg>
       </div>
-      <div class="landing-eyebrow">—　 INVENTORY MANAGEMENT　 —</div>
+      <div class="landing-eyebrow">INVENTORY MANAGEMENT</div>
       <h1>Smart Lagring</h1><div class="landing-rule"></div>
       <p>Streamline your warehouse operations with real-time inventory tracking, automated stock alerts, multi-location management, and detailed reporting — all in one powerful platform built for modern businesses.</p>
       <div class="landing-actions"><button @click="showLoginForm = true">Logga in</button><button class="secondary" @click="showSignupForm = true">Formulär</button></div>
@@ -180,16 +180,16 @@ const submitSignup = async () => {
     </main>
     <div v-if="showSignupForm" class="signup-backdrop" @click.self="showSignupForm = false">
       <div class="signup-card">
-        <button class="signup-close" @click="showSignupForm = false">×</button>
-        <div class="signup-icon">▤</div>
+        <button class="signup-close" aria-label="Stäng" @click="showSignupForm = false">×</button>
+        <div class="signup-icon" aria-hidden="true"><svg class="warehouse-logo" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6v10H3z" /><path d="M6 11h12v9H6zM9 14v6m6-6v6M6 14h12" /></svg></div>
         <h2>Smart Lagring</h2>
         <small>WAREHOUSE MANAGEMENT SYSTEM</small>
         <p>Skapa konto</p>
         <form @submit.prevent="submitSignup">
           <label>Namn<input v-model="signupForm.name" placeholder="Förnamn Efternamn" required /></label>
           <label>E-postadress<input type="email" :class="{ invalid: showSignupErrors && !isValidEmail(signupForm.email.trim()) }" v-model="signupForm.email" placeholder="namn@foretag.se" required /></label>
-          <label>Lösenord<input :class="{ invalid: showSignupErrors && signupForm.password.length < 8 }" v-model="signupForm.password" type="password" placeholder="••••••••" required /></label>
-          <label>Bekräfta lösenord<input :class="{ invalid: showSignupErrors && (!signupForm.confirmPassword || signupForm.password !== signupForm.confirmPassword) }" v-model="signupForm.confirmPassword" type="password" placeholder="••••••••" required /></label>
+          <label>Lösenord<input :class="{ invalid: showSignupErrors && signupForm.password.length < 8 }" v-model="signupForm.password" type="password" placeholder="Minst 8 tecken" required /></label>
+          <label>Bekräfta lösenord<input :class="{ invalid: showSignupErrors && (!signupForm.confirmPassword || signupForm.password !== signupForm.confirmPassword) }" v-model="signupForm.confirmPassword" type="password" placeholder="Upprepa lösenordet" required /></label>
           <label class="two-factor-choice"><input v-model="twoFactorEnabled" type="checkbox" /> Aktivera tvåfaktorsautentisering</label>
           <div v-if="twoFactorEnabled" class="two-factor-enrollment">
             <button type="button" class="two-factor-setup-button" :disabled="twoFactorSetupLoading" @click="setupTwoFactor">{{ twoFactorSetupLoading ? 'Förbereder...' : twoFactorSetup ? 'Skapa ny authenticator-nyckel' : 'Konfigurera authenticator' }}</button>
@@ -204,14 +204,14 @@ const submitSignup = async () => {
             </div>
             <p v-if="twoFactorSetupError" class="signup-errors" role="alert">{{ twoFactorSetupError }}</p>
           </div>
-          <div v-if="showSignupErrors && !canRegister" class="signup-errors">Fyll i alla fält. Lösenordet måste ha minst 8 tecken och matcha bekräftelsen. Om 2FA är aktiverat, konfigurera authenticator och ange aktuell sexsiffrig kod.</div>
+          <div v-if="showSignupErrors && !canRegister" class="signup-errors">Fyll i alla fält. Lösenordet måste ha minst 8 tecken och matcha bekräftelsen. Om 2FA är aktiverat, konfigurera authenticator och ange en aktuell sexsiffrig kod.</div>
           <p v-if="signupError" class="signup-errors" role="alert">{{ signupError }}</p>
-          <button type="submit">Registrera konto →</button>
+          <button type="submit">Registrera konto</button>
         </form>
         <footer>Har du redan ett konto? <b @click="$emit('login'); showSignupForm = false">Logga in</b><small>© Smart Lagring. Alla rättigheter förbehålls.</small></footer>
       </div>
     </div>
-    <div v-if="showLoginForm" class="login-backdrop" @click.self="showLoginForm = false"><div class="login-card"><button class="signup-close" @click="showLoginForm = false">×</button><div class="signup-icon">▤</div><h2>Smart Lagring</h2><small>WAREHOUSE MANAGEMENT SYSTEM</small><p>Inloggning</p><form @submit.prevent="submitLogin"><label>E-postadress<input v-model="loginForm.email" type="email" placeholder="namn@foretag.se" required /></label><label>Lösenord<input v-model="loginForm.password" type="password" placeholder="••••••••" required /></label><label v-if="loginRequiresTwoFactor">Authenticator-kod<input v-model="loginTwoFactorCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required /></label><a>Glömt lösenord?</a><p v-if="loginError" class="login-error">{{ loginError }}</p><button type="submit">{{ loginRequiresTwoFactor ? 'Verifiera kod →' : 'Logga in →' }}</button><button v-if="loginRequiresTwoFactor" type="button" class="two-factor-back" @click="loginRequiresTwoFactor = false; loginTwoFactorCode = ''; loginError = ''">Tillbaka</button></form><footer>© 2026 Smart Lagring. Alla rättigheter förbehålls.</footer></div></div>
+    <div v-if="showLoginForm" class="login-backdrop" @click.self="showLoginForm = false"><div class="login-card"><button class="signup-close" aria-label="Stäng" @click="showLoginForm = false">×</button><div class="signup-icon" aria-hidden="true"><svg class="warehouse-logo" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6v10H3z" /><path d="M6 11h12v9H6zM9 14v6m6-6v6M6 14h12" /></svg></div><h2>Smart Lagring</h2><small>WAREHOUSE MANAGEMENT SYSTEM</small><p>Inloggning</p><form @submit.prevent="submitLogin"><label>E-postadress<input v-model="loginForm.email" type="email" placeholder="namn@foretag.se" required /></label><label>Lösenord<input v-model="loginForm.password" type="password" placeholder="Ange ditt lösenord" required /></label><label v-if="loginRequiresTwoFactor">Authenticator-kod<input v-model="loginTwoFactorCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required /></label><a>Glömt lösenord?</a><p v-if="loginError" class="login-error">{{ loginError }}</p><button type="submit">{{ loginRequiresTwoFactor ? 'Verifiera kod' : 'Logga in' }}</button><button v-if="loginRequiresTwoFactor" type="button" class="two-factor-back" @click="loginRequiresTwoFactor = false; loginTwoFactorCode = ''; loginError = ''">Tillbaka</button></form><footer>© 2026 Smart Lagring. Alla rättigheter förbehålls.</footer></div></div>
     <div v-if="showPendingMessage" class="pending-backdrop" @click.self="showPendingMessage = false"><div class="pending-card"><div class="pending-icon">✓</div><h2>Registrering mottagen</h2><p>Din registrering väntar på validering.</p><button @click="showPendingMessage = false">Stäng</button></div></div>
   </div>
 </template>

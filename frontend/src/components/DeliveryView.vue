@@ -49,8 +49,8 @@ const loadDeliveries = async () => {
   errorMessage.value = ''
   try {
     const [inventoryResponse, shipmentsResponse] = await Promise.all([
-      fetch('http://127.0.0.1:8000/materials', { headers: requestHeaders() }),
-      fetch('http://127.0.0.1:8000/shipments', { headers: requestHeaders() }),
+      fetch('http://127.0.0.1:8001/materials', { headers: requestHeaders() }),
+      fetch('http://127.0.0.1:8001/shipments', { headers: requestHeaders() }),
     ])
     const [inventoryData, shipmentsData] = await Promise.all([
       inventoryResponse.json().catch(() => null),
@@ -77,7 +77,7 @@ const submitShipment = async () => {
   }
   isSaving.value = true
   try {
-    const response = await fetch('http://127.0.0.1:8000/shipments', {
+    const response = await fetch('http://127.0.0.1:8001/shipments', {
       method: 'POST',
       headers: { ...requestHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -118,7 +118,7 @@ const updateShipmentStatus = async (shipment: Shipment, status: 'delivered' | 'c
   errorMessage.value = ''
   successMessage.value = ''
   try {
-    const response = await fetch(`http://127.0.0.1:8000/shipments/${shipment.id}/status`, {
+    const response = await fetch(`http://127.0.0.1:8001/shipments/${shipment.id}/status`, {
       method: 'PATCH',
       headers: { ...requestHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
@@ -206,7 +206,7 @@ onMounted(loadDeliveries)
   </div>
   <div v-if="selectedReceipt" class="receipt-backdrop" @click.self="selectedReceipt = null">
     <article class="receipt-modal" role="dialog" aria-modal="true" aria-labelledby="receipt-title">
-      <div class="receipt-brand"><span>⬡</span><b>Smart Lagring</b></div>
+      <div class="receipt-brand"><span aria-hidden="true"><svg class="warehouse-logo" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6v10H3z" /><path d="M6 11h12v9H6zM9 14v6m6-6v6M6 14h12" /></svg></span><b>Smart Lagring</b></div>
       <p class="receipt-eyebrow">UTGÅENDE LEVERANS</p>
       <h2 id="receipt-title">Leveranskvitto</h2>
       <p class="receipt-number">{{ selectedReceipt.shipment_id }}</p>

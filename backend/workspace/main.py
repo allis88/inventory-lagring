@@ -5,7 +5,12 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+for env_path in (
+    Path(__file__).resolve().parents[1] / ".env",
+    Path(__file__).resolve().parents[2] / ".env",
+):
+    if env_path.exists():
+        load_dotenv(env_path, override=False)
 
 from .routers import activity, applications, auth, materials, members, reports, shipments
 

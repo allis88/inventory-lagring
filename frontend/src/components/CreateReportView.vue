@@ -38,7 +38,7 @@ const loadWarehouses = async () => {
   loadingWarehouses.value = true
   errorMessage.value = ''
   try {
-    const response = await fetch('http://127.0.0.1:8000/warehouse-capacity', { headers: requestHeaders() })
+    const response = await fetch('http://127.0.0.1:8001/warehouse-capacity', { headers: requestHeaders() })
     const result = await response.json().catch(() => null)
     if (!response.ok) throw new Error(result?.detail || 'Kunde inte hämta lagerlistan.')
     warehouses.value = result as Warehouse[]
@@ -57,7 +57,7 @@ const createReport = async () => {
   saving.value = true
   errorMessage.value = ''
   try {
-    const response = await fetch('http://127.0.0.1:8000/reports', {
+    const response = await fetch('http://127.0.0.1:8001/reports', {
       method: 'POST',
       headers: { ...requestHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({

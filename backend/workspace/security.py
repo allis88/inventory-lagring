@@ -11,7 +11,12 @@ from dotenv import load_dotenv
 from fastapi import Header, HTTPException
 from pwdlib import PasswordHash
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+for env_path in (
+    Path(__file__).resolve().parents[1] / ".env",
+    Path(__file__).resolve().parents[2] / ".env",
+):
+    if env_path.exists():
+        load_dotenv(env_path, override=False)
 
 password_hash = PasswordHash.recommended()
 JWT_SECRET = os.getenv("JWT_SECRET") or secrets.token_urlsafe(32)

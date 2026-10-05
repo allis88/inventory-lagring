@@ -40,7 +40,7 @@ const loadMaterials = async () => {
   isLoading.value = true
   errorMessage.value = ''
   try {
-    const response = await fetch('http://localhost:8000/materials', {
+    const response = await fetch('http://localhost:8001/materials', {
       headers: { Authorization: `Bearer ${props.accessToken}` },
     })
     const result = await response.json().catch(() => null)
@@ -60,7 +60,7 @@ const submitMaterial = async () => {
     return
   }
   try {
-    const response = await fetch('http://localhost:8000/materials', {
+    const response = await fetch('http://localhost:8001/materials', {
       method: 'POST',
       headers: {
         ...requestHeaders(),
@@ -88,7 +88,7 @@ const editFootprint = (material: Material) => {
 const saveFootprint = async (material: Material) => {
   errorMessage.value = ''
   try {
-    const response = await fetch(`http://localhost:8000/materials/${material.id}/footprint`, {
+    const response = await fetch(`http://localhost:8001/materials/${material.id}/footprint`, {
       method: 'PATCH',
       headers: { ...requestHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({

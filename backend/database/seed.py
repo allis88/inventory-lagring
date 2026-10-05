@@ -16,7 +16,12 @@ from backend.database.init_db import initialize_database
 from backend.workspace.security import password_hash
 
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+for env_path in (
+    Path(__file__).resolve().parents[1] / ".env",
+    Path(__file__).resolve().parents[2] / ".env",
+):
+    if env_path.exists():
+        load_dotenv(env_path, override=False)
 
 
 def seed_database() -> dict[str, int]:

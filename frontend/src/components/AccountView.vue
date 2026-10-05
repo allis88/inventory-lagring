@@ -17,7 +17,7 @@ const adminHeaders = () => ({ Authorization: `Bearer ${savedAccount?.access_toke
 
 const loadMembers = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/members')
+    const response = await fetch('http://127.0.0.1:8001/members')
     if (!response.ok) throw new Error('Kunde inte hämta giltiga inloggningar.')
     members.value = await response.json()
     error.value = ''
@@ -28,7 +28,7 @@ const loadMembers = async () => {
 
 const loadApplications = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/account-applications', { headers: adminHeaders() })
+    const response = await fetch('http://127.0.0.1:8001/account-applications', { headers: adminHeaders() })
     if (!response.ok) throw new Error('Kunde inte hämta ansökningar.')
     applications.value = await response.json()
     error.value = ''
@@ -39,7 +39,7 @@ const loadApplications = async () => {
 
 const loadLoginHistory = async () => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/login-history', { headers: adminHeaders() })
+    const response = await fetch('http://127.0.0.1:8001/login-history', { headers: adminHeaders() })
     if (!response.ok) throw new Error('Kunde inte hämta inloggningshistoriken.')
     loginHistory.value = await response.json()
     error.value = ''
@@ -58,13 +58,13 @@ const formatLoginTime = (value: string) => new Intl.DateTimeFormat('sv-SE', {
 }).format(new Date(value))
 
 const validateApplication = async (id: string) => {
-  const response = await fetch(`http://127.0.0.1:8000/account-applications/${id}/validate`, { method: 'POST', headers: adminHeaders() })
+  const response = await fetch(`http://127.0.0.1:8001/account-applications/${id}/validate`, { method: 'POST', headers: adminHeaders() })
   if (response.ok) await Promise.all([loadApplications(), loadMembers()])
   else error.value = 'Kunde inte godkänna ansökan.'
 }
 
 const rejectApplication = async (id: string) => {
-  const response = await fetch(`http://127.0.0.1:8000/account-applications/${id}/reject`, { method: 'POST', headers: adminHeaders() })
+  const response = await fetch(`http://127.0.0.1:8001/account-applications/${id}/reject`, { method: 'POST', headers: adminHeaders() })
   if (response.ok) await loadApplications()
   else error.value = 'Kunde inte avvisa ansökan.'
 }
@@ -73,7 +73,7 @@ const deleteMember = async (member: Member) => {
   if (!window.confirm(`Ta bort inloggningen för ${member.name} (${member.email})?`)) return
   error.value = ''
   try {
-    const response = await fetch(`http://127.0.0.1:8000/members/${member.id}`, { method: 'DELETE', headers: adminHeaders() })
+    const response = await fetch(`http://127.0.0.1:8001/members/${member.id}`, { method: 'DELETE', headers: adminHeaders() })
     const result = await response.json().catch(() => null)
     if (!response.ok) throw new Error(result?.detail || 'Kunde inte ta bort inloggningen.')
     await loadMembers()
@@ -85,7 +85,7 @@ const deleteMember = async (member: Member) => {
 const updateRole = async (member: Member, role: 'Worker' | 'Medlem' | 'Admin') => {
   const previousRole = member.role
   member.role = role
-  const response = await fetch(`http://127.0.0.1:8000/members/${member.id}/role`, {
+  const response = await fetch(`http://127.0.0.1:8001/members/${member.id}/role`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...adminHeaders() },
     body: JSON.stringify({ role }),

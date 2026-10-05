@@ -97,7 +97,7 @@ const loadRecentActivities = async () => {
   activityLoading.value = true
   activityError.value = ''
   try {
-    const response = await fetch('http://127.0.0.1:8000/activity-history', {
+    const response = await fetch('http://127.0.0.1:8001/activity-history', {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
     const result = await response.json().catch(() => null)
@@ -114,7 +114,7 @@ const loadInventorySummary = async () => {
   if (!accessToken) return
   inventorySummaryError.value = ''
   try {
-    const response = await fetch('http://127.0.0.1:8000/materials', {
+    const response = await fetch('http://127.0.0.1:8001/materials', {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
     const result = await response.json().catch(() => null)
@@ -211,7 +211,7 @@ const overviewStatistics = computed(() => [
 <LandingView v-if="showLanding" @login="handleLogin" />
 <div v-else class="app" @click="profileMenuOpen = false; sidebarLogoutOpen = false">
     <aside>
-      <div class="brand"><b>⬡</b><strong>Smart lagring</strong></div>
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><svg class="warehouse-logo" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6v10H3z" /><path d="M6 11h12v9H6zM9 14v6m6-6v6M6 14h12" /></svg></span><strong>Smart lagring</strong></div>
       <div class="menu"><small>MENY</small><button v-for="navigationItem in nav" :key="navigationItem" :title="navigationItem" :class="{ on: active === navigationItem }"
           @click="navigate(navigationItem)"><i>{{ navIcons[navigationItem] }}</i>{{ navigationItem }}<em
             v-if="navigationItem === 'Materiel'">{{ totalStockQuantity.toLocaleString('sv-SE') }}</em></button></div>

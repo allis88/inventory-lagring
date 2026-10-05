@@ -5,7 +5,12 @@ from typing import Any
 from dotenv import load_dotenv
 from fastapi import HTTPException
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+for env_path in (
+    Path(__file__).resolve().parents[1] / ".env",
+    Path(__file__).resolve().parents[2] / ".env",
+):
+    if env_path.exists():
+        load_dotenv(env_path, override=False)
 
 try:
     from pymongo import MongoClient
