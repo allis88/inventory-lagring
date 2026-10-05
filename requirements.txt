@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pymongo
+email-validator
+python-dotenv
+pwdlib[argon2]
+pyotp
+cryptography
